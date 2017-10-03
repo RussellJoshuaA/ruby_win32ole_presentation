@@ -1,11 +1,47 @@
+
+###########################
+### Methods for clarity ###
+###########################
+
+def this_directory
+  File.dirname(__FILE__)
+end
+
+def pacman_file_location
+  File.join(this_directory, 'pacman.png').gsub('/', '\\')
+end
+
+def presentation_file_location
+  File.join(this_directory, 'presentation.pptx')
+end
+
+def wait_for_input
+  gets
+end
+
+def random_direction
+  [:west, :east].sample
+end
+
+#############################
+### Launch PowerPoint     ###
+### and open presentation ###
+#############################
+
 require 'win32ole'
-
-THIS_DIR = File.dirname(__FILE__)
-
 app = WIN32OLE.new 'PowerPoint.Application'
-presentation = app.Presentations.Open('C:\Users\Joshua Russell\Dropbox\ruby\ruby_win32ole_presentation\OLE Automation (hexagons).pptx')
+presentation = app.Presentations.Open(presentation_file_location)
 
-gets
+################################
+### Wait during presentation ###
+################################
+
+wait_for_input
+sleep 1.5
+
+########################
+### Eat presentation ###
+########################
 
 number_of_slides = presentation.Slides.Count
 slides = []
@@ -14,7 +50,6 @@ number_of_slides.times do |index|
 end
 
 slides.reverse.each do |slide|
-  sleep 0.2
   slide.select
 
   shapes = []
@@ -29,30 +64,32 @@ slides.reverse.each do |slide|
     shapes << slide.Shapes(index + 1)
   end
 
-  direction = [:west, :east].sample
-
-  case direction
+  case random_direction
     when :west
       pacman_origin_x = 570
       pacman_origin_y = 25 + Random.rand(400)
       pacman_movement_increment = 600 / number_of_shapes
-      pacman = slide.Shapes.AddPicture('c:\Users\Joshua Russell\Dropbox\ruby\ruby_win32ole_presentation\pacman.png', true, true, pacman_origin_x, pacman_origin_y)
+      pacman = slide.Shapes.AddPicture(pacman_file_location, true, true, pacman_origin_x, pacman_origin_y)
     when :east
       pacman_origin_x = 25
       pacman_origin_y = 25 + Random.rand(400)
       pacman_movement_increment = 0 - (600 / number_of_shapes)
-      pacman = slide.Shapes.AddPicture('c:\users\Joshua Russell\Dropbox\ruby\ruby_win32ole_presentation\pacman.png', true, true, pacman_origin_x, pacman_origin_y)
+      pacman = slide.Shapes.AddPicture(pacman_file_location, true, true, pacman_origin_x, pacman_origin_y)
       pacman.Flip(0)
   end
 
   shapes.shuffle.each do |shape|
-    sleep 0.1
+    # sleep 0.1
     pacman.Left = pacman.Left - pacman_movement_increment
     shape.Delete
   end
 
   slide.Delete
 end
+
+#############################################
+### Reconstruct title slide and loop data ###
+#############################################
 
 new_slide = presentation.Slides.Add(1, 1)
 sleep 0.5
