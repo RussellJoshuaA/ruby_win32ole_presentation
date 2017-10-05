@@ -12,7 +12,7 @@ def pacman_file_location
 end
 
 def presentation_file_location
-  File.join(this_directory, 'presentation.pptx')
+  File.join(this_directory, 'presentation.pptx').gsub('/', '\\')
 end
 
 def wait_for_input
