@@ -81,6 +81,7 @@ slides.reverse.each do |slide|
   shapes.shuffle.each do |shape|
     # sleep 0.1
     pacman.Left = pacman.Left - pacman_movement_increment
+    sleep 0.05
     shape.Delete
   end
 
